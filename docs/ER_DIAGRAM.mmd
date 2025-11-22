@@ -1,0 +1,29 @@
+erDiagram
+    STAFF {
+        uuid id PK
+        string username "Unique"
+        string password_hash
+        string hospital "Hospital Code (e.g. hn-001)"
+        timestamp created_at
+    }
+
+    PATIENTS {
+        uuid id PK
+        string patient_hn "Hospital Number / Hospital Code"
+        string first_name_th
+        string middle_name_th
+        string last_name_th
+        string first_name_en
+        string middle_name_en
+        string last_name_en
+        date date_of_birth
+        string national_id "Unique"
+        string passport_id "Unique"
+        string phone_number
+        string email "Unique"
+        enum gender "M, F"
+        timestamp created_at
+    }
+
+    %% Logical Relationship
+    STAFF ||--o{ PATIENTS : "manages (via hospital code)"

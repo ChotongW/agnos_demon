@@ -1,0 +1,16 @@
+Log:
+  Level: debug
+  Color: true
+  JSON: false
+
+API:
+  HTTPServerPort: 8080
+  EnableProfiling: false
+
+Database:
+  Host: "db"
+  Port: 5432
+  User: "postgres"
+  Password: "postgres"
+  Name: "hospital_db"
+

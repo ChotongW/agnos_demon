@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  migrate:
+    build: .
+    command: ["migrate-db", "--config", "cfg/config.yaml", "--force-migrate"]
+    volumes:
+      - ./cfg/config.yaml:/app/cfg/config.yaml
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hospital-net
+    restart: "no"
+
+  app:
+    build: .
+    command: ["serve-user-http-api", "--config", "cfg/config.yaml"]
+    volumes:
+      - ./cfg/config.yaml:/app/cfg/config.yaml
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      db:
+        condition: service_started
+    networks:
+      - hospital-net
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=hospital_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - hospital-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    networks:
+      - hospital-net
+
+networks:
+  hospital-net:
+
+volumes:
+  postgres_data:
