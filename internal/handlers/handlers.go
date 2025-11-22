@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"net/http"
 	"strings"
-	"time"
 
 	"agnos_demo/internal/database"
 	"agnos_demo/internal/middleware"
@@ -199,7 +198,7 @@ func (h *Handlers) SearchPatient(c *gin.Context) {
 			firstNameTH, middleNameTH, lastNameTH              *string
 			firstNameEN, middleNameEN, lastNameEN              *string
 			gender, nationalID, passportID, phoneNumber, email *string
-			dateOfBirth                                        *time.Time
+			dateOfBirth                                        *models.Date
 		)
 
 		err := rows.Scan(
@@ -233,7 +232,7 @@ func (h *Handlers) SearchPatient(c *gin.Context) {
 			p.LastNameEN = *lastNameEN
 		}
 		if dateOfBirth != nil {
-			p.DateOfBirth = *dateOfBirth
+			p.DateOfBirth = dateOfBirth
 		}
 		if gender != nil {
 			p.Gender = *gender
@@ -292,7 +291,7 @@ func (h *Handlers) GetPatientByID(c *gin.Context) {
 		firstNameTH, middleNameTH, lastNameTH              *string
 		firstNameEN, middleNameEN, lastNameEN              *string
 		gender, nationalID, passportID, phoneNumber, email *string
-		dateOfBirth                                        *time.Time
+		dateOfBirth                                        *models.Date
 	)
 
 	err := h.db.QueryRow(ctx, query, identifier).Scan(
@@ -327,7 +326,7 @@ func (h *Handlers) GetPatientByID(c *gin.Context) {
 		p.LastNameEN = *lastNameEN
 	}
 	if dateOfBirth != nil {
-		p.DateOfBirth = *dateOfBirth
+		p.DateOfBirth = dateOfBirth
 	}
 	if gender != nil {
 		p.Gender = *gender

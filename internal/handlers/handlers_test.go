@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"agnos_demo/internal/middleware"
+	"agnos_demo/internal/mocks"
+	"agnos_demo/internal/models"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -9,10 +12,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"testing"
-
-	"agnos_demo/internal/middleware"
-	"agnos_demo/internal/mocks"
-	"agnos_demo/internal/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -277,6 +277,10 @@ func TestSearchPatient(t *testing.T) {
 				s := "John"
 				*firstNameEN = &s
 			}
+			if dob, ok := args.Get(8).(**models.Date); ok {
+				d := models.Date{Time: time.Date(1985, 3, 20, 0, 0, 0, 0, time.UTC)}
+				*dob = &d
+			}
 		}).Return(nil)
 
 		mockRows.On("Err").Return(nil)
@@ -295,6 +299,10 @@ func TestSearchPatient(t *testing.T) {
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
+
+		// Verify JSON string directly to check date format
+		assert.Contains(t, w.Body.String(), `"date_of_birth":"1985-03-20"`)
+
 		var response models.SearchPatientResponse
 		json.Unmarshal(w.Body.Bytes(), &response)
 		assert.Len(t, response.Patient, 1)
